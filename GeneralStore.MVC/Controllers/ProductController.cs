@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using System.Net;
 using System.Web;
 using System.Web.Mvc;
 
@@ -16,7 +17,9 @@ namespace GeneralStore.MVC.Controllers
         // GET: Product
         public ActionResult Index()
         {
-            return View(_db.Products.ToList());
+            List<Product> productList = _db.Products.ToList();
+            List<Product> orderedList = productList.OrderBy(prod => prod.Name).ToList();
+            return View(orderedList);
         }
 
         // GET: Product
@@ -45,7 +48,7 @@ namespace GeneralStore.MVC.Controllers
         {
             if (id == null)
             {
-                return new HttpStatusCodeResult(System.Net.HttpStatusCode.BadRequest);
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
             Product product = _db.Products.Find(id);
@@ -75,7 +78,7 @@ namespace GeneralStore.MVC.Controllers
         {
             if (id == null)
             {
-                return new HttpStatusCodeResult(System.Net.HttpStatusCode.BadRequest);
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
             Product product = _db.Products.Find(id);
@@ -97,6 +100,24 @@ namespace GeneralStore.MVC.Controllers
                 _db.Entry(product).State = EntityState.Modified;
                 _db.SaveChanges();
                 return RedirectToAction("Index");
+            }
+
+            return View(product);
+        }
+
+        // GET: Details
+        // Product/Details/{id}
+        public ActionResult Details(int? id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+
+            Product product = _db.Products.Find(id);
+            if (product == null)
+            {
+                return HttpNotFound();
             }
 
             return View(product);
